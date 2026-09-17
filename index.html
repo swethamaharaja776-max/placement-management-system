@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Placement Management System - responsive college placement cell dashboard">
+  <title>Placement Management System</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,Arial,sans-serif;background:#f4f7fb;color:#172033}
+    button,input,select{font:inherit}
+    button{cursor:pointer;border:0}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:245px;background:#111827;color:#fff;padding:22px 14px;position:fixed;inset:0 auto 0 0}
+    .brand{font-size:20px;font-weight:800;padding:8px 12px 24px}
+    .brand span{display:block;color:#93c5fd;font-size:12px;margin-top:4px;font-weight:500}
+    .nav button{width:100%;text-align:left;background:transparent;color:#cbd5e1;padding:12px 14px;border-radius:10px;margin:3px 0}
+    .nav button:hover,.nav button.active{background:#1e3a5f;color:#fff}
+    .main{margin-left:245px;width:calc(100% - 245px);padding:28px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px}
+    .top h1{font-size:28px}
+    .top p{color:#64748b;margin-top:5px}
+    .btn{padding:10px 15px;border-radius:9px;background:#2563eb;color:white;font-weight:700}
+    .btn.secondary{background:#e2e8f0;color:#172033}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+    .card{background:#fff;border:1px solid #e5eaf1;border-radius:15px;padding:20px;box-shadow:0 5px 18px #0f172a0b}
+    .stat-label{color:#64748b;font-size:13px}
+    .stat-value{font-size:30px;font-weight:800;margin-top:7px}
+    .section{display:none}.section.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .table-card{background:#fff;border:1px solid #e5eaf1;border-radius:15px;overflow:hidden}
+    .table-head{padding:18px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #edf1f5}
+    .table-head h2{font-size:18px}
+    .search{padding:9px 11px;border:1px solid #d7dee8;border-radius:8px;outline:none;width:220px}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:650px}
+    th,td{padding:13px 16px;text-align:left;border-bottom:1px solid #edf1f5;font-size:14px}
+    th{background:#f8fafc;color:#475569;font-size:12px;text-transform:uppercase}
+    .pill{display:inline-block;padding:5px 9px;border-radius:999px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:700}
+    .actions button{background:#eef2ff;color:#3730a3;padding:6px 9px;border-radius:7px;margin-right:5px}
+    .actions .del{background:#fee2e2;color:#b91c1c}
+    .empty{padding:30px;text-align:center;color:#64748b}
+    .chart{height:250px;display:flex;align-items:end;gap:14px;padding:20px}
+    .bar{flex:1;background:#2563eb;border-radius:7px 7px 0 0;min-width:22px;position:relative}
+    .bar span{position:absolute;bottom:-22px;width:100%;text-align:center;font-size:11px;color:#64748b}
+    .modal{position:fixed;inset:0;background:#02061799;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+    .modal.show{display:flex}
+    .modal-box{background:#fff;width:min(560px,100%);border-radius:16px;padding:22px}
+    .modal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .close{background:#eef2f7;width:34px;height:34px;border-radius:50%}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field.full{grid-column:1/-1}
+    .field label{font-size:13px;font-weight:700;color:#475569}
+    .field input,.field select{padding:10px;border:1px solid #d7dee8;border-radius:8px;outline:none}
+    .form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+    .notice{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:14px;border-radius:10px;margin-bottom:18px}
+    .report-list{display:grid;gap:12px}.report-item{padding:15px;border:1px solid #e5eaf1;border-radius:10px;background:#fff}
+    @media(max-width:900px){.sidebar{width:205px}.main{margin-left:205px;width:calc(100% - 205px)}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+    @media(max-width:650px){.sidebar{position:static;width:100%;min-height:auto}.app{display:block}.main{margin:0;width:100%;padding:18px}.stats{grid-template-columns:1fr 1fr}.top{align-items:flex-start}.top h1{font-size:22px}.search{width:145px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">PLACEMENT HUB<span>College Placement Management</span></div>
+    <nav class="nav">
+      <button class="active" data-section="dashboard">🏠 Dashboard</button>
+      <button data-section="students">👨‍🎓 Students</button>
+      <button data-section="companies">🏢 Companies</button>
+      <button data-section="jobs">💼 Jobs / Drives</button>
+      <button data-section="applications">📝 Applications</button>
+      <button data-section="placements">🎯 Placements</button>
+      <button data-section="reports">📊 Reports</button>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <section id="dashboard" class="section active">
+      <div class="top"><div><h1>Placement Dashboard</h1><p>Track students, companies, drives and placement progress.</p></div><button class="btn" onclick="openModal('student')">+ Add Student</button></div>
+      <div class="stats">
+        <div class="card"><div class="stat-label">Students</div><div class="stat-value" id="statStudents">0</div></div>
+        <div class="card"><div class="stat-label">Companies</div><div class="stat-value" id="statCompanies">0</div></div>
+        <div class="card"><div class="stat-label">Open Drives</div><div class="stat-value" id="statJobs">0</div></div>
+        <div class="card"><div class="stat-label">Placed</div><div class="stat-value" id="statPlaced">0</div></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h2>Placement Overview</h2><div class="chart" id="chart"></div></div>
+        <div class="card"><h2>Quick Summary</h2><div class="report-list" id="summary"></div></div>
+      </div>
+    </section>
+
+    <section id="students" class="section">
+      <div class="top"><div><h1>Students</h1><p>Manage student records and eligibility.</p></div><button class="btn" onclick="openModal('student')">+ Add Student</button></div>
+      <div class="table-card"><div class="table-head"><h2>Student Records</h2><input class="search" placeholder="Search students..." oninput="renderStudents(this.value)"></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Roll No</th><th>Department</th><th>CGPA</th><th>Email</th><th>Actions</th></tr></thead><tbody id="studentRows"></tbody></table></div></div>
+    </section>
+
+    <section id="companies" class="section">
+      <div class="top"><div><h1>Companies</h1><p>Manage recruiting companies.</p></div><button class="btn" onclick="openModal('company')">+ Add Company</button></div>
+      <div class="table-card"><div class="table-head"><h2>Company List</h2><input class="search" placeholder="Search companies..." oninput="renderCompanies(this.value)"></div><div class="table-wrap"><table><thead><tr><th>Company</th><th>Industry</th><th>Location</th><th>Package</th><th>Actions</th></tr></thead><tbody id="companyRows"></tbody></table></div></div>
+    </section>
+
+    <section id="jobs" class="section">
+      <div class="top"><div><h1>Jobs / Drives</h1><p>Create and track placement opportunities.</p></div><button class="btn" onclick="openModal('job')">+ Add Drive</button></div>
+      <div class="table-card"><div class="table-head"><h2>Placement Drives</h2><input class="search" placeholder="Search drives..." oninput="renderJobs(this.value)"></div><div class="table-wrap"><table><thead><tr><th>Role</th><th>Company</th><th>Deadline</th><th>Status</th><th>Actions</th></tr></thead><tbody id="jobRows"></tbody></table></div></div>
+    </section>
+
+    <section id="applications" class="section">
+      <div class="top"><div><h1>Applications</h1><p>Track applications and selection status.</p></div><button class="btn" onclick="openModal('application')">+ Add Application</button></div>
+      <div class="table-card"><div class="table-head"><h2>Application Records</h2><input class="search" placeholder="Search applications..." oninput="renderApplications(this.value)"></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="applicationRows"></tbody></table></div></div>
+    </section>
+
+    <section id="placements" class="section">
+      <div class="top"><div><h1>Placements</h1><p>Maintain final placement details.</p></div><button class="btn" onclick="openModal('placement')">+ Add Placement</button></div>
+      <div class="table-card"><div class="table-head"><h2>Placed Students</h2><input class="search" placeholder="Search placements..." oninput="renderPlacements(this.value)"></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Company</th><th>Role</th><th>Package</th><th>Actions</th></tr></thead><tbody id="placementRows"></tbody></table></div></div>
+    </section>
+
+    <section id="reports" class="section">
+      <div class="top"><div><h1>Reports</h1><p>Simple placement analytics from the demo data.</p></div></div>
+      <div class="notice">This GitHub Pages version is a browser-based demo. Data is stored in <b>localStorage</b>, so it remains after refresh on the same browser. It is not a shared server database.</div>
+      <div class="grid"><div class="card"><h2>Key Metrics</h2><div class="report-list" id="metrics"></div></div><div class="card"><h2>Technology</h2><div class="report-list"><div class="report-item">Frontend: HTML, CSS, JavaScript</div><div class="report-item">Hosting: GitHub Pages</div><div class="report-item">Storage: Browser localStorage</div></div></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-top"><h2 id="modalTitle">Add Record</h2><button class="close" onclick="closeModal()">×</button></div>
+    <form id="recordForm"></form>
+  </div>
+</div>
+
+<script>
+const seed={
+  students:[
+    {id:1,name:"Arun Kumar",roll:"AI101",dept:"AI&DS",cgpa:"8.4",email:"arun@example.com"},
+    {id:2,name:"Priya S",roll:"AI102",dept:"CSE",cgpa:"8.8",email:"priya@example.com"},
+    {id:3,name:"Kavin R",roll:"AI103",dept:"ECE",cgpa:"7.9",email:"kavin@example.com"}
+  ],
+  companies:[
+    {id:1,name:"TechNova",industry:"Software",location:"Coimbatore",package:"6.5 LPA"},
+    {id:2,name:"DataSphere",industry:"Analytics",location:"Chennai",package:"7.2 LPA"}
+  ],
+  jobs:[
+    {id:1,role:"Software Developer",company:"TechNova",deadline:"2026-10-10",status:"Open"},
+    {id:2,role:"Data Analyst",company:"DataSphere",deadline:"2026-10-18",status:"Open"}
+  ],
+  applications:[
+    {id:1,student:"Arun Kumar",company:"TechNova",role:"Software Developer",status:"Applied"},
+    {id:2,student:"Priya S",company:"DataSphere",role:"Data Analyst",status:"Selected"}
+  ],
+  placements:[
+    {id:1,student:"Priya S",company:"DataSphere",role:"Data Analyst",package:"7.2 LPA"}
+  ]
+};
+let db=JSON.parse(localStorage.getItem("placementDB")||"null")||seed;
+function save(){localStorage.setItem("placementDB",JSON.stringify(db))}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function renderAll(){save();renderStudents();renderCompanies();renderJobs();renderApplications();renderPlacements();updateDashboard();renderReports()}
+function rows(items,cols,editType){
+  if(!items.length)return '<tr><td colspan="'+(cols.length+1)+'" class="empty">No records found.</td></tr>';
+  return items.map(x=>'<tr>'+cols.map(c=>'<td>'+esc(x[c])+'</td>').join('')+
+    '<td class="actions"><button onclick="openModal(\''+editType+'\','+x.id+')">Edit</button><button class="del" onclick="removeRecord(\''+editType+'\','+x.id+')">Delete</button></td></tr>').join('')
+}
+function renderStudents(q=""){q=q.toLowerCase();document.getElementById("studentRows").innerHTML=rows(db.students.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),["name","roll","dept","cgpa","email"],"student")}
+function renderCompanies(q=""){q=q.toLowerCase();document.getElementById("companyRows").innerHTML=rows(db.companies.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),["name","industry","location","package"],"company")}
+function renderJobs(q=""){q=q.toLowerCase();document.getElementById("jobRows").innerHTML=rows(db.jobs.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),["role","company","deadline","status"],"job")}
+function renderApplications(q=""){q=q.toLowerCase();document.getElementById("applicationRows").innerHTML=rows(db.applications.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),["student","company","role","status"],"application")}
+function renderPlacements(q=""){q=q.toLowerCase();document.getElementById("placementRows").innerHTML=rows(db.placements.filter(x=>JSON.stringify(x).toLowerCase().includes(q)),["student","company","role","package"],"placement")}
+function updateDashboard(){
+  statStudents.textContent=db.students.length;statCompanies.textContent=db.companies.length;
+  statJobs.textContent=db.jobs.filter(x=>x.status==="Open").length;statPlaced.textContent=db.placements.length;
+  const total=db.students.length, placed=db.placements.length, rate=total?Math.round(placed/total*100):0;
+  chart.innerHTML=[["Students",total],["Applied",db.applications.length],["Selected",db.applications.filter(x=>x.status==="Selected").length],["Placed",placed]].map(([n,v])=>'<div class="bar" style="height:'+Math.max(20,(v/(Math.max(total,1)))*180)+'px"><span>'+n+'</span></div>').join('');
+  summary.innerHTML='<div class="report-item">Placement rate: <b>'+rate+'%</b></div><div class="report-item">Open drives: <b>'+db.jobs.filter(x=>x.status==="Open").length+'</b></div><div class="report-item">Selected applications: <b>'+db.applications.filter(x=>x.status==="Selected").length+'</b></div>';
+}
+function renderReports(){metrics.innerHTML='<div class="report-item">Total students: <b>'+db.students.length+'</b></div><div class="report-item">Companies: <b>'+db.companies.length+'</b></div><div class="report-item">Applications: <b>'+db.applications.length+'</b></div><div class="report-item">Placements: <b>'+db.placements.length+'</b></div>'}
+const fields={
+ student:[["name","Full Name","text"],["roll","Roll Number","text"],["dept","Department","text"],["cgpa","CGPA","number"],["email","Email","email"]],
+ company:[["name","Company Name","text"],["industry","Industry","text"],["location","Location","text"],["package","Package","text"]],
+ job:[["role","Job Role","text"],["company","Company","text"],["deadline","Application Deadline","date"],["status","Status","select:Open,Closed"]],
+ application:[["student","Student Name","text"],["company","Company","text"],["role","Job Role","text"],["status","Status","select:Applied,Shortlisted,Selected,Rejected"]],
+ placement:[["student","Student Name","text"],["company","Company","text"],["role","Job Role","text"],["package","Package","text"]]
+};
+let currentType="",editingId=null;
+function openModal(type,id=null){
+  currentType=type;editingId=id;modal.classList.add("show");
+  modalTitle.textContent=(id?"Edit ":"Add ")+type.charAt(0).toUpperCase()+type.slice(1);
+  const item=id?db[type==="student"?"students":type==="company"?"companies":type==="job"?"jobs":type==="application"?"applications":"placements"].find(x=>x.id===id):{};
+  recordForm.innerHTML='<div class="form-grid">'+fields[type].map(([k,label,t])=>{
+    if(t.startsWith("select:")){let opts=t.split(":")[1].split(",");return '<div class="field"><label>'+label+'</label><select name="'+k+'">'+opts.map(o=>'<option '+(item[k]===o?'selected':'')+'>'+o+'</option>').join('')+'</select></div>'}
+    return '<div class="field"><label>'+label+'</label><input name="'+k+'" type="'+t+'" value="'+esc(item[k]||"")+'" required '+(k==="cgpa"?'min="0" max="10" step="0.01"':'')+'></div>'
+  }).join('')+'</div><div class="form-actions"><button type="button" class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn">'+(id?"Update":"Save")+'</button></div>';
+}
+recordForm.addEventListener("submit",e=>{
+  e.preventDefault();const data=Object.fromEntries(new FormData(recordForm));const key=currentType==="student"?"students":currentType==="company"?"companies":currentType==="job"?"jobs":currentType==="application"?"applications":"placements";
+  if(currentType==="student" && (+data.cgpa<0||+data.cgpa>10))return alert("CGPA must be between 0 and 10.");
+  if(data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))return alert("Enter a valid email.");
+  if(key==="students" && db.students.some(x=>x.roll.toLowerCase()===data.roll.toLowerCase()&&x.id!==editingId))return alert("Roll number already exists.");
+  if(editingId){let i=db[key].findIndex(x=>x.id===editingId);db[key][i]={...db[key][i],...data}}
+  else db[key].push({id:Date.now(),...data});
+  closeModal();renderAll();
+});
+function closeModal(){modal.classList.remove("show");recordForm.reset();editingId=null}
+function removeRecord(type,id){
+  if(!confirm("Delete this record?"))return;
+  const key=type==="student"?"students":type==="company"?"companies":type==="job"?"jobs":type==="application"?"applications":"placements";
+  db[key]=db[key].filter(x=>x.id!==id);renderAll();
+}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");
+  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));document.getElementById(b.dataset.section).classList.add("active");
+});
+modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});
+renderAll();
+</script>
+</body>
+</html>
